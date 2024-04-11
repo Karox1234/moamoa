@@ -7,7 +7,6 @@ import com.siot.IamportRestClient.response.IamportResponse
 import com.siot.IamportRestClient.response.Payment
 import com.teamsparta.moamoa.domain.order.model.OrdersStatus
 import com.teamsparta.moamoa.domain.order.repository.OrderRepository
-import com.teamsparta.moamoa.domain.order.service.OrderService
 import com.teamsparta.moamoa.domain.payment.dto.PaymentCallbackRequest
 import com.teamsparta.moamoa.domain.payment.dto.RequestPayDto
 import com.teamsparta.moamoa.domain.payment.model.PaymentStatus
@@ -16,11 +15,10 @@ import com.teamsparta.moamoa.domain.product.repository.ProductStockRepository
 import com.teamsparta.moamoa.event.DiscountPaymentEvent
 import com.teamsparta.moamoa.infra.redis.RedisService
 import jakarta.transaction.Transactional
-import org.springframework.context.ApplicationEventPublisher
-import org.springframework.stereotype.Service
 import java.io.IOException
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.stereotype.Service
 
 @Service
 @Transactional
