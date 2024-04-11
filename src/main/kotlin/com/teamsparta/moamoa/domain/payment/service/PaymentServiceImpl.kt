@@ -10,7 +10,6 @@ import com.teamsparta.moamoa.domain.order.repository.OrderRepository
 import com.teamsparta.moamoa.domain.payment.dto.PaymentCallbackRequest
 import com.teamsparta.moamoa.domain.payment.dto.RequestPayDto
 import com.teamsparta.moamoa.domain.payment.model.PaymentStatus
-import com.teamsparta.moamoa.domain.payment.repository.PaymentRepository
 import com.teamsparta.moamoa.domain.product.repository.ProductStockRepository
 import com.teamsparta.moamoa.event.DiscountPaymentEvent
 import com.teamsparta.moamoa.infra.redis.RedisService
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service
 @Transactional
 class PaymentServiceImpl(
     private val orderRepository: OrderRepository,
-    private val paymentRepository: PaymentRepository,
     private val iamportClient: IamportClient,
     private val productStockRepository: ProductStockRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
