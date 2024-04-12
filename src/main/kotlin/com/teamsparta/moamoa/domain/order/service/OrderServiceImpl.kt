@@ -1,7 +1,7 @@
 package com.teamsparta.moamoa.domain.order.service
 
-import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseEntity
-import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseJoinUserEntity
+import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchase
+import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseJoinUser
 import com.teamsparta.moamoa.domain.groupPurchase.repository.GroupPurchaseJoinUserRepository
 import com.teamsparta.moamoa.domain.groupPurchase.repository.GroupPurchaseRepository
 import com.teamsparta.moamoa.domain.order.dto.CancelResponseDto
@@ -304,9 +304,9 @@ class OrderServiceImpl(
     private fun cancelEtc(
         findOrder: OrdersEntity,
         stock: ProductStock,
-        findGroupJoinUser: GroupPurchaseJoinUserEntity,
+        findGroupJoinUser: GroupPurchaseJoinUser,
         payInfo: PaymentEntity,
-        group: GroupPurchaseEntity,
+        group: GroupPurchase,
     ) {
         findOrder.deletedAt = LocalDateTime.now()
         findOrder.status = OrdersStatus.CANCELLED
