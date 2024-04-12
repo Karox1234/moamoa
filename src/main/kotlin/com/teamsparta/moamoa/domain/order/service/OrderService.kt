@@ -1,7 +1,7 @@
 package com.teamsparta.moamoa.domain.order.service
 
 import com.teamsparta.moamoa.domain.order.dto.*
-import com.teamsparta.moamoa.domain.order.model.OrdersStatus
+import com.teamsparta.moamoa.domain.order.model.OrderStatus
 import com.teamsparta.moamoa.infra.security.UserPrincipal
 import org.springframework.data.domain.Page
 
@@ -52,7 +52,7 @@ interface OrderService {
     fun orderStatusChange(
         orderId: Long,
         sellerId: Long,
-        status: OrdersStatus,
+        status: OrderStatus,
     ): ResponseOrderDto
 
     fun getOrderBySellerId(

@@ -9,7 +9,7 @@ import com.teamsparta.moamoa.domain.order.dto.CreateOrderDto
 import com.teamsparta.moamoa.domain.order.dto.ResponseOrderDto
 import com.teamsparta.moamoa.domain.order.dto.UpdateOrderDto
 import com.teamsparta.moamoa.domain.order.model.OrdersEntity
-import com.teamsparta.moamoa.domain.order.model.OrdersStatus
+import com.teamsparta.moamoa.domain.order.model.OrderStatus
 import com.teamsparta.moamoa.domain.order.model.toResponse
 import com.teamsparta.moamoa.domain.order.repository.OrderRepository
 import com.teamsparta.moamoa.domain.payment.model.PaymentEntity
@@ -272,7 +272,7 @@ class OrderServiceImpl(
             throw Exception("주문정보가 일치하지 않습니다")
         }
 
-        if (findOrder.status == OrdersStatus.CANCELLED) {
+        if (findOrder.status == OrderStatus.CANCELLED) {
             throw Exception("이미 취소된 주문입니다.")
         }
         // 공구 인지 아닌지
@@ -292,7 +292,7 @@ class OrderServiceImpl(
             }
         } else {
             findOrder.deletedAt = LocalDateTime.now()
-            findOrder.status = OrdersStatus.CANCELLED
+            findOrder.status = OrderStatus.CANCELLED
             stock!!.stock += findOrder.quantity // ?.을 써서 어떤식으로 넘길지 모르겠음 세이프콜을 쓰면 오히려 재고가 안맞을수도있을거같음
             // 일반 주문일때 재고원래대로 돌려놓고 주문 논리삭제
         }
@@ -309,7 +309,7 @@ class OrderServiceImpl(
         group: GroupPurchase,
     ) {
         findOrder.deletedAt = LocalDateTime.now()
-        findOrder.status = OrdersStatus.CANCELLED
+        findOrder.status = OrderStatus.CANCELLED
         stock.stock += findOrder.quantity
         findGroupJoinUser.deletedAt = LocalDateTime.now()
         payInfo.deletedAt = LocalDateTime.now()
@@ -365,7 +365,7 @@ class OrderServiceImpl(
     override fun orderStatusChange(
         orderId: Long,
         sellerId: Long,
-        status: OrdersStatus,
+        status: OrderStatus,
     ): ResponseOrderDto {
         val findSeller =
             sellerRepository.findByIdAndDeletedAtIsNull(sellerId).orElseThrow { Exception("존재하지 않는 판매자 입니다") }
@@ -379,7 +379,7 @@ class OrderServiceImpl(
         val findResult =
             findProductList.find { it.id == findOrder!!.product.id } ?: throw Exception("판매자가 파는 상품의 주문이 아닙니다")
         val stock = productStockRepository.findByProduct(findResult)
-        if (status == OrdersStatus.CANCELLED) {
+        if (status == OrderStatus.CANCELLED) {
             findOrder!!.status = status
             stock!!.stock += findOrder.quantity
             productStockRepository.save(stock!!)

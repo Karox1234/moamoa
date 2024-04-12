@@ -5,7 +5,7 @@ import com.siot.IamportRestClient.exception.IamportResponseException
 import com.siot.IamportRestClient.request.CancelData
 import com.siot.IamportRestClient.response.IamportResponse
 import com.siot.IamportRestClient.response.Payment
-import com.teamsparta.moamoa.domain.order.model.OrdersStatus
+import com.teamsparta.moamoa.domain.order.model.OrderStatus
 import com.teamsparta.moamoa.domain.order.repository.OrderRepository
 import com.teamsparta.moamoa.domain.payment.dto.PaymentCallbackRequest
 import com.teamsparta.moamoa.domain.payment.dto.RequestPayDto
@@ -94,7 +94,7 @@ class PaymentServiceImpl(
             }
 
             order.payment.changePaymentBySuccess(PaymentStatus.OK, iamportResponse.response.impUid, null)
-            order.changeOrderBySuccess(OrdersStatus.COMPLETED,null )
+            order.changeOrderBySuccess(OrderStatus.COMPLETED,null )
             stockFind!!.stock -= order.quantity
 
 //            orderService.ifPaymentSuccessOrderChangeAndDeletedAtChange(order.orderUid!!)

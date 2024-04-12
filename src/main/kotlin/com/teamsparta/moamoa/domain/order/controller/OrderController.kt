@@ -3,7 +3,7 @@ import com.teamsparta.moamoa.domain.order.dto.CancelResponseDto
 import com.teamsparta.moamoa.domain.order.dto.CreateOrderDto
 import com.teamsparta.moamoa.domain.order.dto.ResponseOrderDto
 import com.teamsparta.moamoa.domain.order.dto.UpdateOrderDto
-import com.teamsparta.moamoa.domain.order.model.OrdersStatus
+import com.teamsparta.moamoa.domain.order.model.OrderStatus
 import com.teamsparta.moamoa.domain.order.service.OrderService
 import com.teamsparta.moamoa.infra.security.UserPrincipal
 import jakarta.validation.Valid
@@ -134,7 +134,7 @@ class OrderController(
     fun orderStatusChange(
         @PathVariable orderId: Long,
         @PathVariable sellerId: Long,
-        @RequestParam status: OrdersStatus,
+        @RequestParam status: OrderStatus,
     ): ResponseEntity<ResponseOrderDto> {
         return ResponseEntity
             .status(HttpStatus.OK)

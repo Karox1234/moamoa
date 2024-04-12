@@ -1,5 +1,5 @@
 package com.teamsparta.moamoa.domain.order.model
 
-enum class OrdersStatus {
+enum class OrderStatus {
     NOTPAYD, COMPLETED, SHIPPING, DELIVERED, CANCELLED,
 }
