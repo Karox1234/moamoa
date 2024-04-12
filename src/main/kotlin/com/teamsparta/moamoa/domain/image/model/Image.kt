@@ -25,7 +25,6 @@ class Image(
     var imagePath: String? = null,
     @Column(name = "file_name")
     var imageName: String? = null,
-    // 이미지 업로드 엔티티를 참조해야 하는 연관관계 있는 다른 엔티티도 추후 맵핑
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
