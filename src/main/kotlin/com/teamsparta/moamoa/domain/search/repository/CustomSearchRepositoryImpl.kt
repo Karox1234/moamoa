@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository
 class CustomSearchRepositoryImpl : CustomSearchRepository, QueryDslSupport() {
     private val product = QProduct.product
     private val review = QReview.review
-//    private val searchHistory = QSearchHistory.searchHistory
 
     override fun searchProductsByLikes(pageable: Pageable): Page<ProductSearchResponse> {
         val totalCount =

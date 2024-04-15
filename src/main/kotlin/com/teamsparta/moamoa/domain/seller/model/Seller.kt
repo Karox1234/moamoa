@@ -18,8 +18,6 @@ class Seller(
     var phoneNumber: String,
     @Column(name = "biz_reg_number")
     var bizRegistrationNumber: String,
-//    @OneToMany(mappedBy = "seller", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-//    var products: MutableList<Product> = mutableListOf(),
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

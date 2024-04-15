@@ -1,7 +1,5 @@
 package com.teamsparta.moamoa.domain.search.dto
 
-import com.teamsparta.moamoa.infra.BaseTimeEntity
-
 data class ProductSearchResponse(
     val productId: Long,
     val title: String,
@@ -10,4 +8,4 @@ data class ProductSearchResponse(
     val price: Double,
     val ratingAverage: Double?,
     val likes: Int,
-) : BaseTimeEntity()
+)

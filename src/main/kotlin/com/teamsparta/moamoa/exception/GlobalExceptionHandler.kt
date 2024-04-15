@@ -51,6 +51,6 @@ class GlobalExceptionHandler {
     fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponseDto> {
         logger.error("MethodArgumentNotValidException 발생", e)
         val errors = e.bindingResult.fieldErrors.joinToString(separator = ", ") { "${it.field}: ${it.defaultMessage}" }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponseDto(errors)) // (e.message)보다 이렇게 하는게 더 스웨거에서 깔끔하더라
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ErrorResponseDto(errors))
     }
 }
