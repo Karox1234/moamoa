@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 
-data class CreateOrderDto(
+data class CreateOrderRequest(
     val productId:Long,
     @field:NotNull
     val address: String,

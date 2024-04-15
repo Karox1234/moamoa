@@ -8,7 +8,7 @@ import com.siot.IamportRestClient.response.Payment
 import com.teamsparta.moamoa.domain.order.model.OrderStatus
 import com.teamsparta.moamoa.domain.order.repository.OrderRepository
 import com.teamsparta.moamoa.domain.payment.dto.PaymentCallbackRequest
-import com.teamsparta.moamoa.domain.payment.dto.RequestPayDto
+import com.teamsparta.moamoa.domain.payment.dto.PaymentRequest
 import com.teamsparta.moamoa.domain.payment.model.PaymentStatus
 import com.teamsparta.moamoa.domain.product.repository.ProductStockRepository
 import com.teamsparta.moamoa.event.DiscountPaymentEvent
@@ -29,11 +29,11 @@ class PaymentServiceImpl(
     private val redisService: RedisService,
 ) : PaymentService {
 
-    override fun findRequestDto(orderUid: String): RequestPayDto {
+    override fun findRequestDto(orderUid: String): PaymentRequest {
         val order = orderRepository.findOrderAndPaymentAndSocialUser(orderUid)
             .orElseThrow { IllegalArgumentException("주문이 없습니다.") }
 
-        return RequestPayDto(
+        return PaymentRequest(
             buyerName = order.socialUser.nickname,
             buyerAddress = order.address,
             paymentPrice = order.payment.price,

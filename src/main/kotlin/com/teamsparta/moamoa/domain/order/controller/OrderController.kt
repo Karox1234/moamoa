@@ -1,8 +1,8 @@
 package com.teamsparta.moamoa.domain.order.controller
-import com.teamsparta.moamoa.domain.order.dto.CancelResponseDto
-import com.teamsparta.moamoa.domain.order.dto.CreateOrderDto
-import com.teamsparta.moamoa.domain.order.dto.ResponseOrderDto
-import com.teamsparta.moamoa.domain.order.dto.UpdateOrderDto
+import com.teamsparta.moamoa.domain.order.dto.CancelResponse
+import com.teamsparta.moamoa.domain.order.dto.CreateOrderRequest
+import com.teamsparta.moamoa.domain.order.dto.OrderResponse
+import com.teamsparta.moamoa.domain.order.dto.UpdateOrderRequest
 import com.teamsparta.moamoa.domain.order.model.OrderStatus
 import com.teamsparta.moamoa.domain.order.service.OrderService
 import com.teamsparta.moamoa.infra.security.UserPrincipal
@@ -32,9 +32,9 @@ class OrderController(
     @PostMapping("/create/swagger")
     fun createOrderAtSwagger(
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestBody @Valid createOrderDto: CreateOrderDto
-    ): ResponseEntity<ResponseOrderDto> {
-        val responseOrderDto = orderService.createOrder(user,createOrderDto)
+        @RequestBody @Valid createOrderRequest: CreateOrderRequest
+    ): ResponseEntity<OrderResponse> {
+        val responseOrderDto = orderService.createOrder(user,createOrderRequest)
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(responseOrderDto)
@@ -43,9 +43,9 @@ class OrderController(
     @PostMapping("/create")
     fun createOrder(
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestBody @Valid createOrderDto: CreateOrderDto
-    ): ResponseEntity<ResponseOrderDto> {
-        val responseOrderDto = orderService.createOrder(user, createOrderDto)
+        @RequestBody @Valid createOrderRequest: CreateOrderRequest
+    ): ResponseEntity<OrderResponse> {
+        val responseOrderDto = orderService.createOrder(user, createOrderRequest)
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(responseOrderDto)
@@ -55,9 +55,9 @@ class OrderController(
     @PostMapping("/group/create")
     fun createGroupOrder(
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestBody @Valid createOrderDto: CreateOrderDto
-    ): ResponseEntity<ResponseOrderDto> {
-        val responseOrderDto = orderService.createGroupOrder(user,createOrderDto)
+        @RequestBody @Valid createOrderRequest: CreateOrderRequest
+    ): ResponseEntity<OrderResponse> {
+        val responseOrderDto = orderService.createGroupOrder(user,createOrderRequest)
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(responseOrderDto)
@@ -66,9 +66,9 @@ class OrderController(
     @PostMapping("/group/create/swagger")
     fun creatGroupOrderAtSwagger(
         @AuthenticationPrincipal user: UserPrincipal,
-        @RequestBody @Valid createOrderDto: CreateOrderDto
-    ): ResponseEntity<ResponseOrderDto> {
-        val responseOrderDto = orderService.createGroupOrder(user,createOrderDto)
+        @RequestBody @Valid createOrderRequest: CreateOrderRequest
+    ): ResponseEntity<OrderResponse> {
+        val responseOrderDto = orderService.createGroupOrder(user,createOrderRequest)
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(responseOrderDto)
@@ -78,18 +78,18 @@ class OrderController(
     fun updateOrder(
         @AuthenticationPrincipal user: UserPrincipal,
         @PathVariable orderId: Long,
-        @RequestBody updateOrderDto: UpdateOrderDto,
-    ): ResponseEntity<ResponseOrderDto> {
+        @RequestBody updateOrderRequest: UpdateOrderRequest,
+    ): ResponseEntity<OrderResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(orderService.updateOrder(user, orderId, updateOrderDto))
+            .body(orderService.updateOrder(user, orderId, updateOrderRequest))
     }
 
     @PutMapping("/cancel/{orderId}")
     fun cancelOrder(
         @AuthenticationPrincipal user: UserPrincipal,
         @PathVariable orderId: Long,
-    ): ResponseEntity<CancelResponseDto> {
+    ): ResponseEntity<CancelResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(orderService.cancelOrder(user, orderId))
@@ -101,7 +101,7 @@ class OrderController(
     fun getOrder(
         @AuthenticationPrincipal user: UserPrincipal,
         @PathVariable orderId: Long,
-    ): ResponseEntity<ResponseOrderDto> {
+    ): ResponseEntity<OrderResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(orderService.getOrder(user, orderId))
@@ -112,7 +112,7 @@ class OrderController(
     @GetMapping("/getAllOrders")
     fun getAllOrders(
         @AuthenticationPrincipal user: UserPrincipal,
-    ): ResponseEntity<List<ResponseOrderDto>> {
+    ): ResponseEntity<List<OrderResponse>> {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrderList(user))
     }
 
@@ -121,7 +121,7 @@ class OrderController(
         @PathVariable userId: Long,
         @RequestParam(value = "page", defaultValue = "1") page: Int,
         @RequestParam(value = "size", defaultValue = "2") size: Int,
-    ): ResponseEntity<Page<ResponseOrderDto>> {
+    ): ResponseEntity<Page<OrderResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(orderService.getOrderPage(userId, page, size))
@@ -135,7 +135,7 @@ class OrderController(
         @PathVariable orderId: Long,
         @PathVariable sellerId: Long,
         @RequestParam status: OrderStatus,
-    ): ResponseEntity<ResponseOrderDto> {
+    ): ResponseEntity<OrderResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(orderService.orderStatusChange(orderId, sellerId, status))
@@ -146,7 +146,7 @@ class OrderController(
     fun getOrderBySellerId(
         @PathVariable sellerId: Long,
         @PathVariable orderId: Long,
-    ): ResponseEntity<ResponseOrderDto> {
+    ): ResponseEntity<OrderResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(orderService.getOrderBySellerId(sellerId, orderId))
@@ -158,7 +158,7 @@ class OrderController(
         @PathVariable sellerId: Long,
         @RequestParam(value = "page", defaultValue = "1") page: Int,
         @RequestParam(value = "size", defaultValue = "2") size: Int,
-    ): ResponseEntity<Page<ResponseOrderDto>> {
+    ): ResponseEntity<Page<OrderResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(orderService.getOrderPageBySellerId(sellerId, page, size))
@@ -167,7 +167,7 @@ class OrderController(
     @GetMapping("/getOneByOrderUId/{orderUId}")
     fun getOrderByOrderUid(
         @PathVariable orderUId: String
-    ): ResponseEntity<ResponseOrderDto> {
+    ): ResponseEntity<OrderResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(orderService.getOrderByOrderUid(orderUId))

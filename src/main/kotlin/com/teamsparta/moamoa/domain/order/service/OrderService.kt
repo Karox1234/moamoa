@@ -7,8 +7,8 @@ import org.springframework.data.domain.Page
 
 interface OrderService {
     fun createOrder(
-        user: UserPrincipal, createOrderDto: CreateOrderDto
-    ): ResponseOrderDto
+        user: UserPrincipal, createOrderRequest: CreateOrderRequest
+    ): OrderResponse
 
     // 테스트용 락 없는 코드
     fun createOrderNoLock(
@@ -17,60 +17,60 @@ interface OrderService {
         quantity: Int,
         address: String,
         phoneNumber: String,
-    ): ResponseOrderDto
+    ): OrderResponse
 
     fun createGroupOrder(
-        user: UserPrincipal, createOrderDto: CreateOrderDto
-    ): ResponseOrderDto
+        user: UserPrincipal, createOrderRequest: CreateOrderRequest
+    ): OrderResponse
 
     fun updateOrder(
         user: UserPrincipal,
         orderId: Long,
-        updateOrderDto: UpdateOrderDto,
-    ): ResponseOrderDto
+        updateOrderRequest: UpdateOrderRequest,
+    ): OrderResponse
 
     fun cancelOrder(
         user: UserPrincipal,
         orderId: Long,
-    ): CancelResponseDto
+    ): CancelResponse
 
     fun getOrder(
         user: UserPrincipal,
         orderId: Long,
-    ): ResponseOrderDto
+    ): OrderResponse
 
     fun getOrderList(
         user: UserPrincipal,
-    ): List<ResponseOrderDto>
+    ): List<OrderResponse>
 
     fun getOrderPage(
         userId: Long,
         page: Int,
         size: Int,
-    ): Page<ResponseOrderDto>
+    ): Page<OrderResponse>
 
     fun orderStatusChange(
         orderId: Long,
         sellerId: Long,
         status: OrderStatus,
-    ): ResponseOrderDto
+    ): OrderResponse
 
     fun getOrderBySellerId(
         sellerId: Long,
         orderId: Long,
-    ): ResponseOrderDto
+    ): OrderResponse
 
     fun getOrderPageBySellerId(
         sellerId: Long,
         page: Int,
         size: Int,
-    ): Page<ResponseOrderDto>
+    ): Page<OrderResponse>
 
     fun trollOrderDelete(orderUId: String)
 
     fun getOrderByOrderUid(
         orderUId: String,
-    ): ResponseOrderDto
+    ): OrderResponse
 
     fun createOrderWithLock(
         userId: Long,
@@ -78,5 +78,5 @@ interface OrderService {
         quantity: Int,
         address: String,
         phoneNumber: String,
-    ): ResponseOrderDto
+    ): OrderResponse
 }

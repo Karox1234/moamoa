@@ -2,7 +2,7 @@ package com.teamsparta.moamoa.domain.order.dto
 
 import java.time.LocalDateTime
 
-data class ResponseOrderDto(
+data class OrderResponse(
     val orderId: Long,
     val productName: String,
     val totalPrice: Double,

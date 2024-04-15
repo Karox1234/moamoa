@@ -1,7 +1,7 @@
 package com.teamsparta.moamoa.domain.order.model
 
-import com.teamsparta.moamoa.domain.order.dto.ResponseOrderDto
-import com.teamsparta.moamoa.domain.payment.model.PaymentEntity
+import com.teamsparta.moamoa.domain.order.dto.OrderResponse
+import com.teamsparta.moamoa.domain.payment.model.Payment
 import com.teamsparta.moamoa.domain.product.model.Product
 import com.teamsparta.moamoa.domain.socialUser.model.SocialUser
 import com.teamsparta.moamoa.infra.BaseTimeEntity
@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "orders")
-class OrdersEntity(
+class Order(
     @Column(name = "product_name")
     var productName: String,
     @Column(name = "total_price")
@@ -40,7 +40,7 @@ class OrdersEntity(
     var socialUser: SocialUser,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
-    var payment: PaymentEntity,
+    var payment: Payment,
     var orderUid: String?,
     @Column
     val phoneNumber: String,
@@ -63,15 +63,15 @@ class OrdersEntity(
     fun changeOrderBySuccess(
         status: OrderStatus,
         deletedAt: LocalDateTime?
-    ): OrdersEntity {
+    ): Order {
         this.status = status
         this.deletedAt = null
         return this
     }
 }
 
-fun OrdersEntity.toResponse(): ResponseOrderDto {
-    return ResponseOrderDto(
+fun Order.toResponse(): OrderResponse {
+    return OrderResponse(
         orderId = id!!,
         productName = productName,
         totalPrice = totalPrice,
