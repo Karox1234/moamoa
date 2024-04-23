@@ -1,5 +1,5 @@
 package com.teamsparta.moamoa.domain.order.dto
 
-data class CancelResponseDto(
+data class CancelResponse(
     val message: String,
 )

@@ -1,7 +1,7 @@
 package com.teamsparta.moamoa.domain.groupPurchase.service
 
-import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseEntity
-import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseJoinUserEntity
+import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchase
+import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseJoinUser
 import com.teamsparta.moamoa.domain.groupPurchase.repository.GroupPurchaseJoinUserRepository
 import com.teamsparta.moamoa.domain.groupPurchase.repository.GroupPurchaseRepository
 import com.teamsparta.moamoa.domain.product.repository.ProductRepository
@@ -33,7 +33,7 @@ class GroupPurchaseServiceImpl(
 
         if (groupPurchase == null) {
             val newGroupPurchase =
-                GroupPurchaseEntity(
+                GroupPurchase(
                     productId,
                     findProduct.userLimit,
                     1,
@@ -42,7 +42,7 @@ class GroupPurchaseServiceImpl(
                 )
 
             val groupPurchaseJoinUser =
-                GroupPurchaseJoinUserEntity(userId.toLong(), newGroupPurchase, orderId.toLong())
+                GroupPurchaseJoinUser(userId.toLong(), newGroupPurchase, orderId.toLong())
 
             newGroupPurchase.groupPurchaseUsers.add(groupPurchaseJoinUser)
             groupPurchaseRepository.save(newGroupPurchase)
@@ -70,7 +70,7 @@ class GroupPurchaseServiceImpl(
             throw Exception("이미 신청한 공동구매 입니다.")
         }
 
-        val groupPurchaseJoinUser = GroupPurchaseJoinUserEntity(userId, groupPurchase, orderId)
+        val groupPurchaseJoinUser = GroupPurchaseJoinUser(userId, groupPurchase, orderId)
         groupPurchase.groupPurchaseUsers.add(groupPurchaseJoinUser)
         groupPurchase.userCount++
 
@@ -80,7 +80,7 @@ class GroupPurchaseServiceImpl(
             groupPurchase.deletedAt = LocalDateTime.now()
             groupPurchaseRepository.save(groupPurchase)
 
-            val userSoftDelete: List<GroupPurchaseJoinUserEntity> =
+            val userSoftDelete: List<GroupPurchaseJoinUser> =
                 groupPurchaseJoinUserRepository.findByGroupPurchaseId(groupPurchaseId)
 
             userSoftDelete.forEach { user ->
@@ -105,7 +105,7 @@ class GroupPurchaseServiceImpl(
             groupPurchaseJoinUserRepository.findByUserIdAndGroupPurchaseId(userId, groupPurchaseId)
                 ?: throw Exception("userId or groupPurchaseId not found")
 
-        groupPurchase.groupPurchaseUsers.remove(groupPurchaseJoinUser) // 이건 나도 해야댐
+        groupPurchase.groupPurchaseUsers.remove(groupPurchaseJoinUser)
         groupPurchase.userCount--
 
         if (groupPurchase.userCount == 0) {
@@ -116,23 +116,4 @@ class GroupPurchaseServiceImpl(
         groupPurchaseJoinUser.deletedAt = LocalDateTime.now()
         groupPurchaseJoinUserRepository.save(groupPurchaseJoinUser)
     }
-
-//    fun GroupPurchaseEntity.toResponse(): GroupPurchaseResponse {
-//        return GroupPurchaseResponse(
-//            id = id!!,
-//            productId = productId,
-//            userLimit = userLimit,
-//            userCount = userCount,
-//            timeLimit = timeLimit,
-//
-//        )
-//    }
-//
-//    fun GroupPurchaseJoinUserEntity.toResponse(): GroupPurchaseJoinUserResponse {
-//        return GroupPurchaseJoinUserResponse(
-//            id = id!!,
-//            userId = userId,
-//            groupPurchaseId = groupPurchase.id!!,
-//        )
-//    }
 }

@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 @Table(name = "group_purchases")
 @Entity
-class GroupPurchaseEntity(
+class GroupPurchase(
     @Column(name = "product_id")
     val productId: Long,
     @Column(name = "user_limit")
@@ -16,7 +16,7 @@ class GroupPurchaseEntity(
     @Column(name = "time_limit")
     val timeLimit: LocalDateTime?,
     @OneToMany(mappedBy = "groupPurchase", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    val groupPurchaseUsers: MutableList<GroupPurchaseJoinUserEntity> = mutableListOf(),
+    val groupPurchaseUsers: MutableList<GroupPurchaseJoinUser> = mutableListOf(),
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

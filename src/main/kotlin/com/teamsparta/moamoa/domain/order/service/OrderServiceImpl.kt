@@ -1,18 +1,18 @@
 package com.teamsparta.moamoa.domain.order.service
 
-import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseEntity
-import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseJoinUserEntity
+import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchase
+import com.teamsparta.moamoa.domain.groupPurchase.model.GroupPurchaseJoinUser
 import com.teamsparta.moamoa.domain.groupPurchase.repository.GroupPurchaseJoinUserRepository
 import com.teamsparta.moamoa.domain.groupPurchase.repository.GroupPurchaseRepository
-import com.teamsparta.moamoa.domain.order.dto.CancelResponseDto
-import com.teamsparta.moamoa.domain.order.dto.CreateOrderDto
-import com.teamsparta.moamoa.domain.order.dto.ResponseOrderDto
-import com.teamsparta.moamoa.domain.order.dto.UpdateOrderDto
-import com.teamsparta.moamoa.domain.order.model.OrdersEntity
-import com.teamsparta.moamoa.domain.order.model.OrdersStatus
+import com.teamsparta.moamoa.domain.order.dto.CancelResponse
+import com.teamsparta.moamoa.domain.order.dto.CreateOrderRequest
+import com.teamsparta.moamoa.domain.order.dto.OrderResponse
+import com.teamsparta.moamoa.domain.order.dto.UpdateOrderRequest
+import com.teamsparta.moamoa.domain.order.model.Order
+import com.teamsparta.moamoa.domain.order.model.OrderStatus
 import com.teamsparta.moamoa.domain.order.model.toResponse
 import com.teamsparta.moamoa.domain.order.repository.OrderRepository
-import com.teamsparta.moamoa.domain.payment.model.PaymentEntity
+import com.teamsparta.moamoa.domain.payment.model.Payment
 import com.teamsparta.moamoa.domain.payment.model.PaymentStatus
 import com.teamsparta.moamoa.domain.payment.repository.PaymentRepository
 import com.teamsparta.moamoa.domain.product.model.Product
@@ -47,18 +47,18 @@ class OrderServiceImpl(
     @Transactional
     override fun createOrder(
         user: UserPrincipal,
-        createOrderDto: CreateOrderDto
-    ): ResponseOrderDto {
-        val lockKey = "createOrderWithLock_$createOrderDto.productId"
+        createOrderRequest: CreateOrderRequest
+    ): OrderResponse {
+        val lockKey = "createOrderWithLock_$createOrderRequest.productId"
         val lockAcquired = redissonLockManager.acquireLock(lockKey, 15000, 60000)
         if (!lockAcquired) {
             throw Exception("락을 획득할 수 없습니다. 잠시 후 다시 시도해주세요.")
         }
 
         try {
-            val (findUser, findProduct, stockCheck) = orderCommon(user, createOrderDto.productId, createOrderDto.quantity)
+            val (findUser, findProduct, stockCheck) = orderCommon(user, createOrderRequest.productId, createOrderRequest.quantity)
 
-            val totalPrice = findProduct.price * createOrderDto.quantity
+            val totalPrice = findProduct.price * createOrderRequest.quantity
             val finalDiscount = 0.0
 
             return orderSave(
@@ -67,9 +67,9 @@ class OrderServiceImpl(
                 stockCheck,
                 totalPrice,
                 finalDiscount,
-                createOrderDto.address,
-                createOrderDto.quantity,
-                createOrderDto.phoneNumber,
+                createOrderRequest.address,
+                createOrderRequest.quantity,
+                createOrderRequest.phoneNumber,
             ).toResponse()
         } finally {
             redissonLockManager.releaseLock(lockKey)
@@ -79,27 +79,27 @@ class OrderServiceImpl(
     @Transactional
     override fun createGroupOrder(
         user: UserPrincipal,
-        createOrderDto: CreateOrderDto
-    ): ResponseOrderDto {
-        val lockKey = "createOrderWithLock_$createOrderDto.productId"
+        createOrderRequest: CreateOrderRequest
+    ): OrderResponse {
+        val lockKey = "createOrderWithLock_$createOrderRequest.productId"
         val lockAcquired = redissonLockManager.acquireLock(lockKey, 15000, 60000)
         if (!lockAcquired) {
             throw Exception("락을 획득할 수 없습니다. 잠시 후 다시 시도해주세요.")
         }
 
         try {
-            val (findUser, findProduct, stockCheck) = orderCommon(user, createOrderDto.productId, createOrderDto.quantity)
+            val (findUser, findProduct, stockCheck) = orderCommon(user, createOrderRequest.productId, createOrderRequest.quantity)
             val finalDiscount = findProduct.discount
 
             val groupPurchaseCheck =
-                groupPurchaseRepository.findByProductIdAndDeletedAtIsNull(createOrderDto.productId) // 없으면 유저도 없는거니께
+                groupPurchaseRepository.findByProductIdAndDeletedAtIsNull(createOrderRequest.productId) // 없으면 유저도 없는거니께
             val groupPurchaseUserCheck = groupPurchaseCheck?.groupPurchaseUsers?.find { it.userId == findUser.id }
 
             if (groupPurchaseUserCheck == null) {
-                val totalPrice = findProduct.price * createOrderDto.quantity * (1 - findProduct.discount / 100.0)
+                val totalPrice = findProduct.price * createOrderRequest.quantity * (1 - findProduct.discount / 100.0)
 
                 return orderSave(
-                    findUser, findProduct, stockCheck, totalPrice, finalDiscount, createOrderDto.address, createOrderDto.quantity, createOrderDto.phoneNumber
+                    findUser, findProduct, stockCheck, totalPrice, finalDiscount, createOrderRequest.address, createOrderRequest.quantity, createOrderRequest.phoneNumber
                 ).toResponse()
             } else {
                 throw Exception("이미 공동 구매 신청중인 유저는 주문을 신청 할 수 없습니다.")
@@ -131,7 +131,7 @@ class OrderServiceImpl(
         quantity: Int,
         address: String,
         phoneNumber: String,
-    ): ResponseOrderDto {
+    ): OrderResponse {
         val (findUser, findProduct, stockCheck) = orderCommonForTest(userId, productId, quantity)
 
         val totalPrice = findProduct.price * quantity
@@ -156,7 +156,7 @@ class OrderServiceImpl(
         quantity: Int,
         address: String,
         phoneNumber: String,
-    ): ResponseOrderDto {
+    ): OrderResponse {
         val lockKey = "createOrderWithLock_$productId"
         val lockAcquired = redissonLockManager.acquireLock(lockKey, 15000, 60000)
         if (!lockAcquired) {
@@ -207,10 +207,10 @@ class OrderServiceImpl(
         address: String,
         quantity: Int,
         phoneNumber: String,
-    ): OrdersEntity {
-        val payment = PaymentEntity(price = totalPrice, status = PaymentStatus.READY , deletedAt = LocalDateTime.now())
+    ): Order {
+        val payment = Payment(price = totalPrice, status = PaymentStatus.READY , deletedAt = LocalDateTime.now())
         paymentRepository.save(payment)
-        val order = OrdersEntity(
+        val order = Order(
             productName = findProduct.title,
             totalPrice = totalPrice,
             address = address,
@@ -234,14 +234,14 @@ class OrderServiceImpl(
     override fun updateOrder(
         user: UserPrincipal,
         orderId: Long,
-        updateOrderDto: UpdateOrderDto,
-    ): ResponseOrderDto {
+        updateOrderRequest: UpdateOrderRequest,
+    ): OrderResponse {
         val findUser =
             socialUserRepository.findByProviderId(user.id.toString()).orElseThrow() ?: throw Exception("존재하지 않는 유저입니다")
         val findOrders = orderRepository.findByIdAndDeletedAtIsNull(orderId)
         // 논리삭제가 된 주문은 업데이트 할 필요가 없기 때문에 찾지 않도록 함
         if (findOrders!!.socialUser == findUser) {
-            findOrders.address = updateOrderDto.address
+            findOrders.address = updateOrderRequest.address
             return orderRepository.save(findOrders).toResponse()
         } else {
             throw Exception("도둑 검거 완료")
@@ -252,7 +252,7 @@ class OrderServiceImpl(
     override fun cancelOrder(
         user: UserPrincipal,
         orderId: Long,
-    ): CancelResponseDto {
+    ): CancelResponse {
         val findUser =
             socialUserRepository.findByProviderId(user.id.toString()).orElseThrow() ?: throw Exception("존재하지 않는 유저입니다")
         val findOrder = orderRepository.findByIdAndDeletedAtIsNull(orderId)
@@ -272,7 +272,7 @@ class OrderServiceImpl(
             throw Exception("주문정보가 일치하지 않습니다")
         }
 
-        if (findOrder.status == OrdersStatus.CANCELLED) {
+        if (findOrder.status == OrderStatus.CANCELLED) {
             throw Exception("이미 취소된 주문입니다.")
         }
         // 공구 인지 아닌지
@@ -292,24 +292,24 @@ class OrderServiceImpl(
             }
         } else {
             findOrder.deletedAt = LocalDateTime.now()
-            findOrder.status = OrdersStatus.CANCELLED
+            findOrder.status = OrderStatus.CANCELLED
             stock!!.stock += findOrder.quantity // ?.을 써서 어떤식으로 넘길지 모르겠음 세이프콜을 쓰면 오히려 재고가 안맞을수도있을거같음
             // 일반 주문일때 재고원래대로 돌려놓고 주문 논리삭제
         }
-        return CancelResponseDto(
+        return CancelResponse(
             message = "주문이 취소 되었습니다",
         )
     }
 
     private fun cancelEtc(
-        findOrder: OrdersEntity,
+        findOrder: Order,
         stock: ProductStock,
-        findGroupJoinUser: GroupPurchaseJoinUserEntity,
-        payInfo: PaymentEntity,
-        group: GroupPurchaseEntity,
+        findGroupJoinUser: GroupPurchaseJoinUser,
+        payInfo: Payment,
+        group: GroupPurchase,
     ) {
         findOrder.deletedAt = LocalDateTime.now()
-        findOrder.status = OrdersStatus.CANCELLED
+        findOrder.status = OrderStatus.CANCELLED
         stock.stock += findOrder.quantity
         findGroupJoinUser.deletedAt = LocalDateTime.now()
         payInfo.deletedAt = LocalDateTime.now()
@@ -320,7 +320,7 @@ class OrderServiceImpl(
     override fun getOrder(
         user: UserPrincipal,
         orderId: Long,
-    ): ResponseOrderDto {
+    ): OrderResponse {
         val findUser =
             socialUserRepository.findByProviderId(user.id.toString()).orElseThrow() ?: throw Exception("존재하지 않는 유저입니다")
         val findOrder = orderRepository.findByIdAndDeletedAtIsNull(orderId) ?: throw Exception("존재하지 않는 주문 입니다")
@@ -333,12 +333,12 @@ class OrderServiceImpl(
     }
 
     @Transactional
-    override fun getOrderList(user: UserPrincipal): List<ResponseOrderDto> {
+    override fun getOrderList(user: UserPrincipal): List<OrderResponse> {
         val findUser =
             socialUserRepository.findByProviderId(user.id.toString()).orElseThrow() ?: throw Exception("존재하지 않는 유저입니다")
         val orders = orderRepository.findBySocialUserIdAndDeletedAtIsNull(findUser.id!!)
         return orders.map { order ->
-            ResponseOrderDto(
+            OrderResponse(
                 orderId = order.id!!,
                 productName = order.productName,
                 totalPrice = order.totalPrice,
@@ -357,7 +357,7 @@ class OrderServiceImpl(
         userId: Long,
         page: Int,
         size: Int,
-    ): Page<ResponseOrderDto> {
+    ): Page<OrderResponse> {
         return orderRepository.getOrderPage(userId, page, size).map { it.toResponse() }
     }
 
@@ -365,8 +365,8 @@ class OrderServiceImpl(
     override fun orderStatusChange(
         orderId: Long,
         sellerId: Long,
-        status: OrdersStatus,
-    ): ResponseOrderDto {
+        status: OrderStatus,
+    ): OrderResponse {
         val findSeller =
             sellerRepository.findByIdAndDeletedAtIsNull(sellerId).orElseThrow { Exception("존재하지 않는 판매자 입니다") }
         val findProductList = productRepository.findBySellerId(findSeller.id!!) // 이거 잘 몰겠음
@@ -379,7 +379,7 @@ class OrderServiceImpl(
         val findResult =
             findProductList.find { it.id == findOrder!!.product.id } ?: throw Exception("판매자가 파는 상품의 주문이 아닙니다")
         val stock = productStockRepository.findByProduct(findResult)
-        if (status == OrdersStatus.CANCELLED) {
+        if (status == OrderStatus.CANCELLED) {
             findOrder!!.status = status
             stock!!.stock += findOrder.quantity
             productStockRepository.save(stock!!)
@@ -392,7 +392,7 @@ class OrderServiceImpl(
     override fun getOrderBySellerId(
         sellerId: Long,
         orderId: Long,
-    ): ResponseOrderDto {
+    ): OrderResponse {
         val findSeller =
             sellerRepository.findByIdAndDeletedAtIsNull(sellerId).orElseThrow { Exception("존재하지 않는 판매자 입니다") }
         val findOrder = orderRepository.findByIdOrNull(orderId) ?: throw Exception("존재하지 않는 주문 입니다")
@@ -409,7 +409,7 @@ class OrderServiceImpl(
         sellerId: Long,
         page: Int,
         size: Int,
-    ): Page<ResponseOrderDto> {
+    ): Page<OrderResponse> {
         return orderRepository.getOrderPageBySellerId(sellerId, page, size).map { it.toResponse() }
     } // 이 로직은 취소된것도 알수있어야 한다 생각하여 논리삭제된것도 예외없이 다 검색함
 
@@ -427,7 +427,7 @@ class OrderServiceImpl(
     @Transactional
     override fun getOrderByOrderUid(
         orderUId: String,
-    ): ResponseOrderDto {
+    ): OrderResponse {
         val order = orderRepository.findByOrderUidAndDeletedAtIsNull(orderUId) ?: throw Exception()
         return order.toResponse()
     }

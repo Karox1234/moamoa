@@ -1,6 +1,6 @@
 package com.teamsparta.moamoa.domain.review.dto
 
-import com.teamsparta.moamoa.domain.order.model.OrdersEntity
+import com.teamsparta.moamoa.domain.order.model.Order
 import com.teamsparta.moamoa.domain.product.model.Product
 import com.teamsparta.moamoa.domain.review.model.Review
 import com.teamsparta.moamoa.domain.socialUser.model.SocialUser
@@ -19,7 +19,7 @@ data class CreateReviewRequest(
     fun toReview(
         product: Product,
         socialUser: SocialUser,
-        order: OrdersEntity,
+        order: Order,
     ): Review {
         return Review(
             title = title,

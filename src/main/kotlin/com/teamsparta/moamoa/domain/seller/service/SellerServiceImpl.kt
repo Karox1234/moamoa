@@ -1,6 +1,6 @@
 package com.teamsparta.moamoa.domain.seller.service
 
-import com.teamsparta.moamoa.domain.order.model.OrdersStatus
+import com.teamsparta.moamoa.domain.order.model.OrderStatus
 import com.teamsparta.moamoa.domain.order.repository.OrderRepository
 import com.teamsparta.moamoa.domain.product.repository.ProductRepository
 import com.teamsparta.moamoa.domain.seller.dto.*
@@ -54,7 +54,7 @@ class SellerServiceImpl(
             throw InvalidCredentialException()
         }
         val foundOrders = orderRepository.findBySellerIdAndDeletedAtIsNull(sellerId)
-        if (foundOrders.any { it.status != OrdersStatus.DELIVERED && it.status != OrdersStatus.CANCELLED }) {
+        if (foundOrders.any { it.status != OrderStatus.DELIVERED && it.status != OrderStatus.CANCELLED }) {
             throw Exception("처리되지 않은 주문이 존재합니다. ")
         }
 

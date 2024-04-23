@@ -28,12 +28,11 @@ class ReviewController(
         @PathVariable orderId: Long,
         @AuthenticationPrincipal user: UserPrincipal,
         @Valid @RequestBody createReviewRequest: CreateReviewRequest,
-    ): ResponseEntity<List<ReviewResponse>> {
+    ): ResponseEntity<ReviewResponse> {
         val result = reviewService.createReview(user.id, createReviewRequest, orderId)
-        val results = listOf(result)
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(results)
+            .body(result)
     }
 
     @GetMapping("/review/{reviewId}")

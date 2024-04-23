@@ -8,12 +8,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 interface ReviewService {
-//    fun createReview(
-//        productId: Long,
-//        providerId: Long,
-//        createReviewRequest: CreateReviewRequest,
-//        orderId: Long,
-//    ): ReviewResponse
 
     fun createReview(
         providerId: Long,

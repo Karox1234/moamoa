@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "payments")
-class PaymentEntity(
+class Payment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -21,7 +21,7 @@ class PaymentEntity(
         status: PaymentStatus,
         paymentUid: String,
         deletedAt: LocalDateTime?
-    ): PaymentEntity {
+    ): Payment {
         this.status = status
         this.paymentUid = paymentUid
         this.deletedAt = null

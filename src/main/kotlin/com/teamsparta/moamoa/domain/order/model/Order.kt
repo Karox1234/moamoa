@@ -1,17 +1,27 @@
 package com.teamsparta.moamoa.domain.order.model
 
-import com.teamsparta.moamoa.domain.order.dto.ResponseOrderDto
-import com.teamsparta.moamoa.domain.payment.model.PaymentEntity
-import com.teamsparta.moamoa.domain.payment.model.PaymentStatus
+import com.teamsparta.moamoa.domain.order.dto.OrderResponse
+import com.teamsparta.moamoa.domain.payment.model.Payment
 import com.teamsparta.moamoa.domain.product.model.Product
 import com.teamsparta.moamoa.domain.socialUser.model.SocialUser
 import com.teamsparta.moamoa.infra.BaseTimeEntity
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "orders")
-class OrdersEntity(
+class Order(
     @Column(name = "product_name")
     var productName: String,
     @Column(name = "total_price")
@@ -30,7 +40,7 @@ class OrdersEntity(
     var socialUser: SocialUser,
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id")
-    var payment: PaymentEntity,
+    var payment: Payment,
     var orderUid: String?,
     @Column
     val phoneNumber: String,
@@ -48,20 +58,20 @@ class OrdersEntity(
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    var status: OrdersStatus = OrdersStatus.NOTPAYD
+    var status: OrderStatus = OrderStatus.NOTPAYD
 
     fun changeOrderBySuccess(
-        status: OrdersStatus,
+        status: OrderStatus,
         deletedAt: LocalDateTime?
-    ): OrdersEntity {
+    ): Order {
         this.status = status
         this.deletedAt = null
         return this
     }
 }
 
-fun OrdersEntity.toResponse(): ResponseOrderDto {
-    return ResponseOrderDto(
+fun Order.toResponse(): OrderResponse {
+    return OrderResponse(
         orderId = id!!,
         productName = productName,
         totalPrice = totalPrice,

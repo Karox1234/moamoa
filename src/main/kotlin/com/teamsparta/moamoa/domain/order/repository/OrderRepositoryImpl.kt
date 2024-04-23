@@ -1,7 +1,7 @@
 package com.teamsparta.moamoa.domain.order.repository
 
-import com.teamsparta.moamoa.domain.order.model.OrdersEntity
-import com.teamsparta.moamoa.domain.order.model.QOrdersEntity
+import com.teamsparta.moamoa.domain.order.model.Order
+import com.teamsparta.moamoa.domain.order.model.QOrder
 import com.teamsparta.moamoa.domain.product.model.QProduct
 import com.teamsparta.moamoa.domain.seller.model.QSeller
 import com.teamsparta.moamoa.infra.QueryDslSupport
@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 
 class OrderRepositoryImpl : CustomOrderRepository, QueryDslSupport() {
-    private val orders = QOrdersEntity.ordersEntity
+    private val order = QOrder.order
     private val product = QProduct.product
     private val seller = QSeller.seller
 
@@ -17,13 +17,13 @@ class OrderRepositoryImpl : CustomOrderRepository, QueryDslSupport() {
         userId: Long,
         page: Int,
         size: Int,
-    ): Page<OrdersEntity> {
+    ): Page<Order> {
         val result =
-            queryFactory.selectFrom(orders)
-                .where(orders.socialUser.id.eq(userId))
+            queryFactory.selectFrom(order)
+                .where(order.socialUser.id.eq(userId))
                 .offset((page - 1).toLong())
                 .limit(size.toLong())
-                .orderBy(orders.createdAt.desc())
+                .orderBy(order.createdAt.desc())
                 .fetch()
         return PageImpl(result)
     }
@@ -32,16 +32,16 @@ class OrderRepositoryImpl : CustomOrderRepository, QueryDslSupport() {
         sellerId: Long,
         page: Int,
         size: Int,
-    ): Page<OrdersEntity> {
+    ): Page<Order> {
         val join =
-            queryFactory.selectFrom(orders)
-                .join(orders.product, product).fetchJoin()
+            queryFactory.selectFrom(order)
+                .join(order.product, product).fetchJoin()
                 .where(seller.id.eq(sellerId))
         val result =
             join
                 .offset((page - 1).toLong())
                 .limit(size.toLong())
-                .orderBy(orders.product.id.asc())
+                .orderBy(order.product.id.asc())
                 .fetch()
         return PageImpl(result)
     }

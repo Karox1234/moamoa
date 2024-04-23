@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 
-data class CreateOrderDto(
+data class CreateOrderRequest(
     val productId:Long,
     @field:NotNull
     val address: String,
@@ -15,4 +15,3 @@ data class CreateOrderDto(
     @field:Pattern(regexp = "^01(?:0|1|[6-9])(\\d{3,4})(\\d{4})$", message = "핸드폰 번호 양식으로 입력해 주세요")
     val phoneNumber: String
 )
-// validated 로 quantity 값 잘 만져주기
