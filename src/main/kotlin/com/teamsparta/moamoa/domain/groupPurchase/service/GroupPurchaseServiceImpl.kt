@@ -80,14 +80,7 @@ class GroupPurchaseServiceImpl(
             groupPurchase.deletedAt = LocalDateTime.now()
             groupPurchaseRepository.save(groupPurchase)
 
-            val userSoftDelete: List<GroupPurchaseJoinUser> =
-                groupPurchaseJoinUserRepository.findByGroupPurchaseId(groupPurchaseId)
-
-            userSoftDelete.forEach { user ->
-                user.deletedAt = LocalDateTime.now()
-            }
-
-            groupPurchaseJoinUserRepository.saveAll(userSoftDelete)
+            groupPurchaseJoinUserRepository.findByGroupPurchaseIdAndSoftDelete(groupPurchaseId)
         }
         redisTemplate.delete(orderId.toString())
     }
